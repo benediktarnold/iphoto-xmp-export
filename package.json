@@ -1,0 +1,19 @@
+{
+  "name": "iphoto-faces",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "BSD",
+  "dependencies": {
+    "async.coffee": "0.0.1",
+    "exif2": "0.0.1",
+    "exiftool": "0.0.3",
+    "minimist": "^1.1.0",
+    "nextflow": "^0.3.0",
+    "sqlite3": "^2.2.7"
+  }
+}
