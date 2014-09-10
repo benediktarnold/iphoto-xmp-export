@@ -14,6 +14,7 @@
     "exiftool": "0.0.3",
     "minimist": "^1.1.0",
     "nextflow": "^0.3.0",
+    "plist": "^1.1.0",
     "sqlite3": "^2.2.7"
   }
 }

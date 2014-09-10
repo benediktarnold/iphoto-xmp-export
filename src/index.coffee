@@ -4,7 +4,7 @@ fs = require 'fs'
 parseArgs = require 'minimist'
 path = require 'path'
 async = require 'async'
-next = require 'nextflow'
+exec = require('child_process').execFile
 
 args = require('minimist')(process.argv.slice(2) )
 
@@ -27,13 +27,25 @@ extractFaces = (library, faces)->
 	(fullpath, cb) ->
 		file = path.basename(fullpath)
 		exifCreateDate fullpath, (err, data) ->
-			library.all "select RKMaster.uuid, strftime('%Y:%m:%d %H:%M:%S',fileCreationDate,'unixepoch','31 years','localtime') as CreateDate, RKMaster.fileName from RKMaster where RKMAster.originalFileName =? and RKMaster.fileisReference=0;", [file], (err2, masters) ->
+			library.all "select RKMaster.uuid, strftime('%Y:%m:%d %H:%M:%S',fileCreationDate,'unixepoch','31 years','localtime') as CreateDate, RKMaster.fileName from RKMaster where RKMAster.originalFileName =? and RKMaster.fileisReference=0", [file], (err2, masters) ->
 				selectedExif = masters.filter (result) -> result.CreateDate == data.createDate
-				#console.log(selectedExif)
-				faces.all "select RKFaceName.name, RKDetectedFace.masterUuid from RKFaceName INNER JOIN RKDetectedFace  USING (faceKey) WHERE RKDetectedFace.masterUuid=?", [selectedExif[0].uuid], (err3, faces) ->
-					names = faces.map (face) -> face.name
-					nameString = names.join ", "
-					console.log "\"#{fullpath}\";\"#{nameString}\""
+				master = selectedExif[0]
+				if master
+					library.all "select RKKeyword.name from RKKeyword join RKKeywordForVersion on RKKeyword.modelId=RKKeywordForVersion.keywordId join RKVersion on RKKeywordForVersion.versionId=RKVErsion.modelId where RKVersion.masterUuid=?",[master.uuid], (err5,keywords)->
+						faces.all "select RKFaceName.name, RKDetectedFace.masterUuid from RKFaceName INNER JOIN RKDetectedFace  USING (faceKey) WHERE RKDetectedFace.masterUuid=?", [master.uuid], (err3, faces) ->
+							#console.log(err5, keywords, master)
+							keywordNames = keywords.map (keyword) -> keyword.name
+							names = faces.map (face) -> "People|#{face.name}"
+							combined = keywordNames.concat names
+							if combined.length > 0
+								exifArgs = combined.map (keyword)-> "-XMP:HierarchicalSubject=#{keyword}"
+								
+								xmpFile = fullpath.split(".")[0]+".xmp"
+								exifArgs.push xmpFile
+								exec("exiftool",exifArgs,cb)
+							else
+								cb null
+				else 
 					cb null
 
 withFacesAndLibrary= (bothDBReady)->
