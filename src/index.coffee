@@ -8,11 +8,15 @@ exec = require('child_process').execFile
 
 args = require('minimist')(process.argv.slice(2) )
 
+#console.log(args)
+
 if args.faces
 	console.log "faces"
 
 if args.keywords
 	console.log "keywords"
+
+pathToIphotoLibrary = args.library
 
 
 
@@ -51,17 +55,16 @@ extractFaces = (library, faces)->
 withFacesAndLibrary= (bothDBReady)->
 	flow =
 		library: (callback)->
-			library = new sqlite3.Database '/Users/ben/Desktop/Database/apdb/Library.apdb', sqlite3.OPEN_READONLY, ->
+			library = new sqlite3.Database "#{pathToIphotoLibrary}/Database/apdb/Library.apdb", sqlite3.OPEN_READONLY, ->
 				callback null,library
 		faces: (callback)->
-			faces = new sqlite3.Database '/Users/ben/Desktop/Database/apdb/Faces.db', sqlite3.OPEN_READONLY, ->
+			faces = new sqlite3.Database "#{pathToIphotoLibrary}/Database/apdb/Faces.db", sqlite3.OPEN_READONLY, ->
 				callback null,faces
 	async.parallel flow, bothDBReady
 
 withFacesAndLibrary (err,results)->
 	library = results.library
 	faces = results.faces
-	#console.log library, faces
 
 	files = args._
 
@@ -71,19 +74,3 @@ withFacesAndLibrary (err,results)->
 
 	library.close
 	faces.close
-
-###
-library = new sqlite3.Database '/Users/ben/Desktop/Database/apdb/Library.apdb', sqlite3.OPEN_READONLY, ->
-	faces = new sqlite3.Database '/Users/ben/Desktop/Database/apdb/Faces.db', sqlite3.OPEN_READONLY, ->
-
-		extractKeywords = (file)->
-			outputKeywords library, faces, file
-
-		files = require('minimist')(process.argv.slice(2) )._
-		console.log(files)
-		
-		extractKeywords file for file in files
-
-		library.close
-		faces.close
-###
