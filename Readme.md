@@ -5,6 +5,7 @@ Usage
 
 1. Whithin iPhoto export your originals to a location of choice
 2. run
+3. 
 	iphoto-xmp-export --library={path to your iphoto library} {the exported originals}
 
 For example
