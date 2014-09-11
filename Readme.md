@@ -6,10 +6,10 @@ Usage
 1. Whithin iPhoto export your originals to a location of choice
 2. run
  
-	iphoto-xmp-export --library={path to your iphoto library} {the exported originals}
+	`iphoto-xmp-export --library={path to your iphoto library} {the exported originals}`
 
 For example
 
-	iphoto-xmp-export --library=/Users/ben/Pictures/iPhoto-Mediathek.photolibrary ~/Desktop/export/**/*.NEF
+	`iphoto-xmp-export --library=/Users/ben/Pictures/iPhoto-Mediathek.photolibrary ~/Desktop/export/**/*.NEF`
 
 This software comes with absolutely no warranty!
